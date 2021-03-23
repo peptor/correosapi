@@ -1,0 +1,102 @@
+    public function preRegistroEnvio(){
+
+        $IdiomaErrores = 'ES';
+        $fechaOperacion = new Carbon();
+        $fechaOperacion = $fechaOperacion->format('d-m-Y h:m:s');
+        $CodEtiquetador = $this->codigoEtiquitador;
+        $TotalBultos = 1;
+        $ModDevEtiqueta = '1';
+        $Care = '000000';
+        $Remitente = array (
+            'Identificacion' => array ('Nombre'=>'Luis',
+            'Apellido1' => 'Gonzalez',
+            'Apellido2' => 'Pérez',
+            'Nif' => '11111111H'),
+            'DatosDireccion' => array (
+                'Direccion'=>'Emilio Ferrari',
+                'Numero'=>'42',
+                'Piso'=>'5',
+                'Puerta'=>'B',
+                'Localidad'=>'Madrid',
+                'Provincia' => 'Madrid',                 
+             ),             
+             'CP'=> '28017',
+             'Telefonocontacto' => '913252684',
+             'Email'=>'luis.gonazalez@gmail.com<',
+             'DatosSMS' => array ('NumeroSMS'=>'696801756', 'Idioma'=>'1')
+        );
+
+        $Destinatario = array (
+            'Identificacion' => array ('Nombre'=>'Alberto',
+            'Apellido1' => 'Rojo',
+            'Apellido2' => 'Gonzalez'),            
+            'DatosDireccion' => array (
+                 'Direccion'=>'Diagonal',
+                 'Numero'=>'8',
+                 'Piso'=>'8',
+                 'Puerta'=>'A',
+                 'Localidad'=>'Barcelona',
+                 'Provincia' => 'Barcelona',
+            ),
+            'DatosDireccion2' => [
+                'Direccion'=>'Bellmunt',
+                'Localidad'=>'Vic',
+            ],
+            'CP'=> '08021',
+            'Telefonocontacto' => '93121345',
+            'Email'=>'xxxxx@me.com',
+            'DatosSMS' => array ('NumeroSMS'=>'696122436', 'Idioma'=>'1')
+        );
+
+        $Envio = array (
+            'CodProducto'=>'S0132',
+            'ReferenciaCliente'=>'PA00001',
+            'TipoFranqueo'=>'FP',
+            'ModalidadEntrega'=>'ST',
+
+
+            'Pesos' => array('Peso' => array('TipoPeso'=>'R', 'Valor'=>'300'),
+                                       array('TipoPeso'=>'V', 'Valor'=>'450')
+             ),            
+            'Largo'=>'12',
+            'Alto'=>'10',
+            'Ancho'=>'15',
+            'ValoresAnadidos' => array (
+                'ImporteSeguro'=>'090050',
+                'Reembolso'=> array (
+                    'TipoReembolso'=>'RC',
+                    'Importe'=>'090050',
+                    'NumeroCuenta'=>'00720101930000122351'
+                ),
+                'EntregaExclusivaDestinatario'=>'5',
+                'PruebaEntrega' => array (
+                    'Formato'=>'3',
+                    'ReferenciaeAR'=>'ENCABEZADO ACUSE DE RECIBO ELECTRONICO',
+                    'InfRemitenteEAr'=>'PIE DE ACUSE DE RECIBO ELECTRONICO'
+                )
+            )
+        );
+
+        $XML = [
+            'IdiomaErrores'  => $IdiomaErrores,
+            'FechaOperacion'=> $fechaOperacion,
+            'CodEtiquetador' => $CodEtiquetador,
+            'Care' => $Care,
+            'ModDevEtiqueta' => $ModDevEtiqueta,
+            'Remitente'=> $Remitente,
+            'Destinatario'=> $Destinatario,
+            'Envio'=> $Envio
+        ];
+
+
+        try {
+            $result = $this->clientSoap->PreRegistro($XML);        
+        } catch ( \SoapFault $e){
+            Log::debug('Fallo SoapFault - ' . $e->getMessage());
+            $result = $e->getMessage();                
+
+        } catch ( \Exception $e ) {
+            $result = $e->getMessage();                
+        }
+        return $result;    
+    }

@@ -1,0 +1,126 @@
+    public function preRegistroEnvio(){
+        $credentialsPre = "wusutest:Hl8lwJJt";
+        $fechaOperacion = new Carbon();
+        $fechaOperacion = $fechaOperacion->format('d-m-Y h:m:s');               
+        $xml_data = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns="http://www.correos.es/iris6/services/preregistroetiquetas">
+         <soapenv:Header/>
+         <soapenv:Body>
+         <PreregistroEnvio>
+         <FechaOperacion>'. $fechaOperacion .'</FechaOperacion>
+         <CodEtiquetador>XXX1</CodEtiquetador>
+         <Care>000000</Care>
+         <ModDevEtiqueta>1</ModDevEtiqueta>
+         <Remitente>
+         <Identificacion>
+         <Nombre>Luis</Nombre>
+         <Apellido1>Gonzalez</Apellido1>
+         <Apellido2>Perez</Apellido2>
+         <Nif>11111111H</Nif>
+         </Identificacion>
+         <DatosDireccion>
+         <Direccion>Emilio Ferrari</Direccion>
+         <Numero>42</Numero>
+         <Piso>5</Piso>
+         <Puerta>B</Puerta>
+         <Localidad>Madrid</Localidad>
+         <Provincia>Madrid</Provincia>
+         </DatosDireccion>
+         <CP>28017</CP>
+         <Telefonocontacto>913252684</Telefonocontacto>
+         <Email>luis.gonazalez@gmail.com</Email>
+         <DatosSMS>
+         <NumeroSMS>696801756</NumeroSMS>
+         <Idioma>1</Idioma>
+         </DatosSMS>
+         </Remitente>
+         <Destinatario>
+         <Identificacion>
+         <Nombre>Alberto</Nombre>
+         <Apellido1>Rojo</Apellido1>
+         <Apellido2>Gonzalez</Apellido2>
+         </Identificacion>
+         <DatosDireccion>
+         <Direccion>Diagonal</Direccion>
+         <Numero>8</Numero>
+         <Piso>8</Piso>
+         <Puerta>A</Puerta>
+         <Localidad>Barcelona</Localidad>
+         <Provincia>Barcelona</Provincia>
+         </DatosDireccion>
+         <CP>08021</CP>
+         <Telefonocontacto>93121345</Telefonocontacto>
+         <Email>xxxxx@me.com</Email>
+         <DatosSMS>
+         <NumeroSMS>696122436</NumeroSMS>
+         <Idioma>1</Idioma>
+         </DatosSMS>
+         </Destinatario>
+         <Envio>
+         <CodProducto>S0132</CodProducto>
+         <ReferenciaCliente>PA00001</ReferenciaCliente>
+         <TipoFranqueo>FP</TipoFranqueo>
+         <ModalidadEntrega>ST</ModalidadEntrega>
+         <Pesos>            
+         <TipoPeso>R</TipoPeso>
+         <Valor>100</Valor>
+         </Peso>
+         </Pesos>
+         <Largo>12</Largo>
+         <Alto>10</Alto>
+         <Ancho>15</Ancho>
+         <ValoresAnadidos>
+         <ImporteSeguro>090050</ImporteSeguro>
+         <Reembolso>
+         <TipoReembolso>RC</TipoReembolso>
+         <Importe>090050</Importe>
+         <NumeroCuenta>00720101930000122351</NumeroCuenta>
+         </Reembolso>
+         <EntregaExclusivaDestinatario>S</EntregaExclusivaDestinatario>
+         <PruebaEntrega>
+         <Formato>1</Formato>
+         <ReferenciaeAR>ENCABEZADO ACUSE DE RECIBO
+        ELECTRONICO</ReferenciaeAR>
+         <InfRemitenteEAr>PIE DE ACUSE DE RECIBO
+        ELECTRONICO</InfRemitenteEAr>
+         </PruebaEntrega>
+         </ValoresAnadidos>
+         </Envio>
+         </PreregistroEnvio>
+         </soapenv:Body>
+        </soapenv:Envelope>';
+
+        $url = "https://preregistroenviospre.correos.es/preregistroenvios";
+        $page = "/preregistroenvios";
+        $headers = array (
+        "Content-type: text/xml;charset='utf-8'",
+        "Accept: text/xml",
+        "Cache-Control: no-cache",
+        "Pragma: no-cache",
+        "SOAPAction: 'PreRegistro'",
+        "Content-length: ".strlen($xml_data),
+        );
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_USERPWD,$credentialsPre);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml;charset=utf-8',
+        'Content-Length: '.strlen($xml_data),
+        'Authorization: Basic '.base64_encode($credentialsPre),
+        'SOAPAction: PreRegistro'));
+        //curl_setopt($ch, CURLOPT_USERAGENT, $defined_vars['HTTP_USER_AGENT']);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml_data);
+        $data = curl_exec($ch);
+        if (curl_errno($ch)) {
+            $data = htmlspecialchars($data);
+        } else {
+            //$data = self::xmlError($data);
+            $data = htmlspecialchars($data);
+        } 
+        curl_close($ch);
+        return view('correos', ['log' => $data]);
+    }
